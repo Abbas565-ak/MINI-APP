@@ -87,65 +87,10 @@
             font-size: 12px;
             opacity: 0.7;
         }
-        .active-chat {
-            display: none;
-            margin-top: 20px;
-        }
-        #chat-display {
-            height: 300px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #2c1340;
-            border-radius: 10px;
-            border: 1px solid #4a2565;
-        }
-        #user-input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 20px;
-            border: none;
-            background: #3a1c4a;
-            color: #f8e7ff;
-            margin-bottom: 10px;
-        }
-        #send-btn {
-            background: #6a3093;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 80%;
-        }
-        .user-message {
-            background: #4a2565;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
-        }
-        .bot-message {
-            background: #3a1c4a;
-            margin-right: auto;
-            border-bottom-left-radius: 5px;
-        }
-        .back-btn {
-            background: none;
-            border: none;
-            color: #e2a6ff;
-            margin-bottom: 15px;
-            cursor: pointer;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
-    <div class="container" id="main-view">
+    <div class="container">
         <header>
             <h1>Vixens Fantasy</h1>
             <div class="tagline">Choose your fantasy encounter</div>
@@ -177,37 +122,19 @@
             </div>
         </div>
         
+        <div class="scenes" id="scenes-container" style="display: none;">
+            <!-- Scenes will be inserted here -->
+            <button class="back-btn" onclick="backToCharacters()" style="background: none; border: none; color: #e2a6ff; margin-bottom: 15px; cursor: pointer;">← Back to characters</button>
+        </div>
+        
         <div class="footer">
             Tap a character to begin your fantasy
-        </div>
-    </div>
-    
-    <div class="container" id="scenes-view" style="display: none;">
-        <button class="back-btn" onclick="backToMain()">← Back to characters</button>
-        <h2 id="scene-title">Choose a scene</h2>
-        <div class="scenes" id="scenes-container">
-            <!-- Scenes will be inserted here -->
-        </div>
-    </div>
-    
-    <div class="container" id="chat-view" style="display: none;">
-        <button class="back-btn" onclick="backToScenes()">← Back to scenes</button>
-        <h2 id="chat-title">Chat with <span id="character-chat-name"></span></h2>
-        
-        <div class="active-chat">
-            <div id="chat-display"></div>
-            <input type="text" id="user-input" placeholder="Type your message...">
-            <button id="send-btn" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.MainButton.hide();
-        
-        let currentCharacter = '';
-        let currentScene = '';
         
         const characters = {
             cassandra: {
@@ -241,111 +168,46 @@
         };
         
         function showScenes(character) {
-            currentCharacter = character;
             const charData = characters[character];
-            
-            document.getElementById('scene-title').textContent = ${charData.name}'s Scenes;
-            
             const scenesContainer = document.getElementById('scenes-container');
-            scenesContainer.innerHTML = '';
+            
+            scenesContainer.innerHTML = `
+                <button class="back-btn" onclick="backToCharacters()" style="background: none; border: none; color: #e2a6ff; margin-bottom: 15px; cursor: pointer;">← Back to characters</button>
+                <h2 style="color: #ffd6f7; margin-top: 0;">${charData.name}'s Scenes</h2>
+            `;
             
             charData.scenes.forEach(scene => {
                 const sceneBtn = document.createElement('button');
                 sceneBtn.className = 'scene-btn';
                 sceneBtn.innerHTML = <strong>${scene.name}</strong><br><small>${scene.desc}</small>;
-                sceneBtn.onclick = () => startChat(scene.id);
+                sceneBtn.onclick = () => selectScene(character, scene.id);
                 scenesContainer.appendChild(sceneBtn);
             });
             
-            document.getElementById('main-view').style.display = 'none';
-            document.getElementById('scenes-view').style.display = 'block';
+            scenesContainer.style.display = 'block';
+            document.querySelector('.character-grid').style.display = 'none';
+            document.querySelector('.footer').style.display = 'none';
         }
         
-        function backToMain() {
-            document.getElementById('scenes-view').style.display = 'none';
-            document.getElementById('main-view').style.display = 'block';
+        function backToCharacters() {
+            document.getElementById('scenes-container').style.display = 'none';
+            document.querySelector('.character-grid').style.display = 'grid';
+            document.querySelector('.footer').style.display = 'block';
         }
         
-        function backToScenes() {
-            document.getElementById('chat-view').style.display = 'none';
-            document.getElementById('scenes-view').style.display = 'block';
-            document.querySelector('.active-chat').style.display = 'none';
-        }
-        
-        function startChat(sceneId) {
-            currentScene = sceneId;
-            const charName = characters[currentCharacter].name;
-            const sceneName = characters[currentCharacter].scenes.find(s => s.id === sceneId).name;
-            
-            document.getElementById('character-chat-name').textContent = ${charName} - ${sceneName};
-            document.getElementById('scenes-view').style.display = 'none';
-            document.getElementById('chat-view').style.display = 'block';
-            document.querySelector('.active-chat').style.display = 'block';
-            
-            // Initialize chat
-            document.getElementById('chat-display').innerHTML = '';
-            addBotMessage(*${sceneName.replace('_', ' ').title()}*\n\n${characters[currentCharacter].scenes.find(s => s.id === sceneId).desc});
-            
-            // Send data to bot
-            tg.sendData(JSON.stringify({
+        function selectScene(character, sceneId) {
+            const sceneData = {
                 action: 'set_scene',
+                character: character,
                 scene: sceneId
-            }));
-        }
-        
-        function addBotMessage(text) {
-            const chatDisplay = document.getElementById('chat-display');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message bot-message';
-            messageDiv.textContent = text;
-            chatDisplay.appendChild(messageDiv);
-            chatDisplay.scrollTop = chatDisplay.scrollHeight;
-        }
-        
-        function addUserMessage(text) {
-            const chatDisplay = document.getElementById('chat-display');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message user-message';
-            messageDiv.textContent = text;
-            chatDisplay.appendChild(messageDiv);
-            chatDisplay.scrollTop = chatDisplay.scrollHeight;
-        }
-        
-        function sendMessage() {
-            const input = document.getElementById('user-input');
-            const message = input.value.trim();
+            };
             
-            if (message) {
-                addUserMessage(message);
-                input.value = '';
-                
-                // Send message to bot
-                tg.sendData(JSON.stringify({
-                    action: 'user_message',
-                    message: message,
-                    scene: currentScene
-                }));
-            }
+            tg.sendData(JSON.stringify(sceneData));
+            tg.close();
         }
         
-        // Handle Enter key
-        document.getElementById('user-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-        
-        // Handle messages from bot
-        tg.onEvent('webAppDataReceived', (event) => {
-            try {
-                const data = JSON.parse(event);
-                if (data.bot_message) {
-                    addBotMessage(data.bot_message);
-                }
-            } catch (e) {
-                console.error('Error parsing webAppData:', e);
-            }
-        });
+        // Initialize the app
+        tg.ready();
     </script>
 </body>
 </html>
