@@ -87,10 +87,34 @@
             font-size: 12px;
             opacity: 0.7;
         }
+        .warning-banner {
+            background: #ff6b6b;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            color: #e2a6ff;
+            margin-bottom: 15px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #scenes-container {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="warning-banner" id="telegram-warning">
+        ⚠️ This app only works properly within Telegram
+    </div>
+    
+    <div class="container" id="main-view">
         <header>
             <h1>Vixens Fantasy</h1>
             <div class="tagline">Choose your fantasy encounter</div>
@@ -122,20 +146,26 @@
             </div>
         </div>
         
-        <div class="scenes" id="scenes-container" style="display: none;">
-            <!-- Scenes will be inserted here -->
-            <button class="back-btn" onclick="backToCharacters()" style="background: none; border: none; color: #e2a6ff; margin-bottom: 15px; cursor: pointer;">← Back to characters</button>
-        </div>
-        
         <div class="footer">
             Tap a character to begin your fantasy
         </div>
     </div>
+    
+    <div class="container" id="scenes-container">
+        <!-- Scenes will be inserted here -->
+    </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        // Check if running in Telegram
+        const tg = window.Telegram?.WebApp;
+        const isTelegram = !!tg;
         
+        // Show warning if not in Telegram
+        if (!isTelegram) {
+            document.getElementById('telegram-warning').style.display = 'block';
+        }
+        
+        // Character data
         const characters = {
             cassandra: {
                 name: "Cassandra",
@@ -147,67 +177,80 @@
             chef: {
                 name: "Chef Bianće",
                 scenes: [
-                    { id: "chef_cream", name: "👅 Cream Lick", desc: "Just licked cream off your finger..." },
-                    { id: "chef_bend", name: "🔥 Bend Over Oven", desc: "Showing off your lingerie..." }
+                    { id: "chef_cream", name: "👅 Cream Lick", desc: "Just licked cream off finger..." },
+                    { id: "chef_bend", name: "🔥 Bend Over Oven", desc: "Showing off lingerie..." }
                 ]
             },
             neighbor: {
                 name: "Scarlett",
                 scenes: [
-                    { id: "neigh_bath", name: "🚿 Towel Drop", desc: "Just dropped your towel..." },
-                    { id: "neigh_garden", name: "🌺 Wet Garden", desc: "Watering plants in see-through shirt..." }
+                    { id: "neigh_bath", name: "🚿 Towel Drop", desc: "Just dropped towel..." },
+                    { id: "neigh_garden", name: "🌺 Wet Garden", desc: "See-through shirt..." }
                 ]
             },
             aunt: {
                 name: "Aunt Lana",
                 scenes: [
                     { id: "aunt_tv", name: "📺 TV Cuddle", desc: "Lounging in lingerie..." },
-                    { id: "aunt_bed", name: "🛏️ Bed Tease", desc: "Bending over your bed..." }
+                    { id: "aunt_bed", name: "🛏️ Bed Tease", desc: "Bending over bed..." }
                 ]
             }
         };
         
+        // Show scenes for selected character
         function showScenes(character) {
+            if (!isTelegram) {
+                alert("Please open this in Telegram to use all features");
+                return;
+            }
+            
             const charData = characters[character];
             const scenesContainer = document.getElementById('scenes-container');
             
             scenesContainer.innerHTML = `
-                <button class="back-btn" onclick="backToCharacters()" style="background: none; border: none; color: #e2a6ff; margin-bottom: 15px; cursor: pointer;">← Back to characters</button>
-                <h2 style="color: #ffd6f7; margin-top: 0;">${charData.name}'s Scenes</h2>
+                <button class="back-btn" onclick="backToCharacters()">← Back to characters</button>
+                <h2 style="color: #ffd6f7;">${charData.name}'s Scenes</h2>
+                ${charData.scenes.map(scene => `
+                    <button class="scene-btn" onclick="selectScene('${character}', '${scene.id}')">
+                        <strong>${scene.name}</strong><br>
+                        <small>${scene.desc}</small>
+                    </button>
+                `).join('')}
             `;
             
-            charData.scenes.forEach(scene => {
-                const sceneBtn = document.createElement('button');
-                sceneBtn.className = 'scene-btn';
-                sceneBtn.innerHTML = <strong>${scene.name}</strong><br><small>${scene.desc}</small>;
-                sceneBtn.onclick = () => selectScene(character, scene.id);
-                scenesContainer.appendChild(sceneBtn);
-            });
-            
+            document.getElementById('main-view').style.display = 'none';
             scenesContainer.style.display = 'block';
-            document.querySelector('.character-grid').style.display = 'none';
-            document.querySelector('.footer').style.display = 'none';
         }
         
+        // Go back to character selection
         function backToCharacters() {
             document.getElementById('scenes-container').style.display = 'none';
-            document.querySelector('.character-grid').style.display = 'grid';
-            document.querySelector('.footer').style.display = 'block';
+            document.getElementById('main-view').style.display = 'block';
         }
         
+        // Handle scene selection
         function selectScene(character, sceneId) {
+            if (!isTelegram) {
+                alert(Scene selected: ${sceneId}\n(In Telegram, this would start your chat));
+                return;
+            }
+            
             const sceneData = {
                 action: 'set_scene',
                 character: character,
-                scene: sceneId
+                scene: sceneId,
+                timestamp: Date.now()
             };
             
             tg.sendData(JSON.stringify(sceneData));
             tg.close();
         }
         
-        // Initialize the app
-        tg.ready();
+        // Initialize Telegram Web App if in Telegram
+        if (isTelegram) {
+            tg.expand();
+            tg.ready();
+        }
     </script>
 </body>
 </html>
