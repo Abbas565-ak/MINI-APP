@@ -1,256 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vixens Fantasy</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1e0a2a;
-            color: #f8e7ff;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 100%;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-            background: linear-gradient(90deg, #3a1c4a 0%, #6a3093 100%);
-            border-radius: 0 0 20px 20px;
-        }
-        h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #ffd6f7;
-        }
-        .tagline {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-top: 5px;
-        }
-        .character-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        .character-card {
-            background: #2c1340;
-            border-radius: 15px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid #4a2565;
-        }
-        .character-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(106, 48, 147, 0.3);
-        }
-        .character-icon {
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-        .character-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #e2a6ff;
-        }
-        .scenes {
-            margin-top: 15px;
-        }
-        .scene-btn {
-            background: #4a2565;
-            border: none;
-            color: #f8e7ff;
-            padding: 8px 12px;
-            margin: 5px 0;
-            border-radius: 20px;
-            width: 100%;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .scene-btn:hover {
-            background: #6a3093;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 12px;
-            opacity: 0.7;
-        }
-        .warning-banner {
-            background: #ff6b6b;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            display: none;
-        }
-        .back-btn {
-            background: none;
-            border: none;
-            color: #e2a6ff;
-            margin-bottom: 15px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        #scenes-container {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vixens Fantasy Mini App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #ff4da6;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+    }
+    button {
+      background: #ff4da6;
+      color: #fff;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #e04395;
+    }
+  </style>
 </head>
 <body>
-    <div class="warning-banner" id="telegram-warning">
-        ⚠️ This app only works properly within Telegram
+  <h1>💋 Vixens Fantasy</h1>
+  <div id="main">
+    <h2>Choose a Vixen</h2>
+    <div class="button-group">
+      <button onclick="showScenes('cass')">👩 Cassandra (Stepmom)</button>
+      <button onclick="showScenes('chef')">👩‍🍳 Chef Bianće</button>
+      <button onclick="showScenes('neigh')">👩 Scarlett (Neighbor)</button>
+      <button onclick="showScenes('aunt')">👩 Aunt Lana</button>
     </div>
-    
-    <div class="container" id="main-view">
-        <header>
-            <h1>Vixens Fantasy</h1>
-            <div class="tagline">Choose your fantasy encounter</div>
-        </header>
-        
-        <div class="character-grid">
-            <div class="character-card" onclick="showScenes('cassandra')">
-                <div class="character-icon">💃</div>
-                <div class="character-name">Cassandra</div>
-                <div class="character-desc">Seductive Stepmom</div>
-            </div>
-            
-            <div class="character-card" onclick="showScenes('chef')">
-                <div class="character-icon">👩‍🍳</div>
-                <div class="character-name">Chef Bianće</div>
-                <div class="character-desc">Flirtatious Cook</div>
-            </div>
-            
-            <div class="character-card" onclick="showScenes('neighbor')">
-                <div class="character-icon">🏡</div>
-                <div class="character-name">Scarlett</div>
-                <div class="character-desc">Hot Neighbor</div>
-            </div>
-            
-            <div class="character-card" onclick="showScenes('aunt')">
-                <div class="character-icon">👩</div>
-                <div class="character-name">Aunt Lana</div>
-                <div class="character-desc">Tempting Aunt</div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            Tap a character to begin your fantasy
-        </div>
-    </div>
-    
-    <div class="container" id="scenes-container">
-        <!-- Scenes will be inserted here -->
-    </div>
+  </div>
 
-    <script>
-        // Check if running in Telegram
-        const tg = window.Telegram?.WebApp;
-        const isTelegram = !!tg;
-        
-        // Show warning if not in Telegram
-        if (!isTelegram) {
-            document.getElementById('telegram-warning').style.display = 'block';
-        }
-        
-        // Character data
-        const characters = {
-            cassandra: {
-                name: "Cassandra",
-                scenes: [
-                    { id: "cass_sleep", name: "💤 Sleeping Tease", desc: "Sheet slipped down revealing..." },
-                    { id: "cass_kitchen", name: "🍳 Kitchen Flirt", desc: "Wearing only an apron..." }
-                ]
-            },
-            chef: {
-                name: "Chef Bianće",
-                scenes: [
-                    { id: "chef_cream", name: "👅 Cream Lick", desc: "Just licked cream off finger..." },
-                    { id: "chef_bend", name: "🔥 Bend Over Oven", desc: "Showing off lingerie..." }
-                ]
-            },
-            neighbor: {
-                name: "Scarlett",
-                scenes: [
-                    { id: "neigh_bath", name: "🚿 Towel Drop", desc: "Just dropped towel..." },
-                    { id: "neigh_garden", name: "🌺 Wet Garden", desc: "See-through shirt..." }
-                ]
-            },
-            aunt: {
-                name: "Aunt Lana",
-                scenes: [
-                    { id: "aunt_tv", name: "📺 TV Cuddle", desc: "Lounging in lingerie..." },
-                    { id: "aunt_bed", name: "🛏️ Bed Tease", desc: "Bending over bed..." }
-                ]
-            }
-        };
-        
-        // Show scenes for selected character
-        function showScenes(character) {
-            if (!isTelegram) {
-                alert("Please open this in Telegram to use all features");
-                return;
-            }
-            
-            const charData = characters[character];
-            const scenesContainer = document.getElementById('scenes-container');
-            
-            scenesContainer.innerHTML = `
-                <button class="back-btn" onclick="backToCharacters()">← Back to characters</button>
-                <h2 style="color: #ffd6f7;">${charData.name}'s Scenes</h2>
-                ${charData.scenes.map(scene => `
-                    <button class="scene-btn" onclick="selectScene('${character}', '${scene.id}')">
-                        <strong>${scene.name}</strong><br>
-                        <small>${scene.desc}</small>
-                    </button>
-                `).join('')}
-            `;
-            
-            document.getElementById('main-view').style.display = 'none';
-            scenesContainer.style.display = 'block';
-        }
-        
-        // Go back to character selection
-        function backToCharacters() {
-            document.getElementById('scenes-container').style.display = 'none';
-            document.getElementById('main-view').style.display = 'block';
-        }
-        
-        // Handle scene selection
-        function selectScene(character, sceneId) {
-            if (!isTelegram) {
-                alert(Scene selected: ${sceneId}\n(In Telegram, this would start your chat));
-                return;
-            }
-            
-            const sceneData = {
-                action: 'set_scene',
-                character: character,
-                scene: sceneId,
-                timestamp: Date.now()
-            };
-            
-            tg.sendData(JSON.stringify(sceneData));
-            tg.close();
-        }
-        
-        // Initialize Telegram Web App if in Telegram
-        if (isTelegram) {
-            tg.expand();
-            tg.ready();
-        }
-    </script>
+  <div id="scenes" style="display:none;">
+    <h2 id="scene-title">Scenes</h2>
+    <div id="scene-buttons" class="button-group"></div>
+    <button onclick="goBack()">🔙 Back</button>
+  </div>
+
+  <script>
+    const scenes = {
+      cass: [
+        { text: "💤 Sleeping Tease", key: "cass_sleep" },
+        { text: "🍳 Kitchen Flirt", key: "cass_kitchen" }
+      ],
+      chef: [
+        { text: "👅 Cream Lick", key: "chef_cream" },
+        { text: "🔥 Bend Over Oven", key: "chef_bend" }
+      ],
+      neigh: [
+        { text: "🚿 Towel Drop", key: "neigh_bath" },
+        { text: "🌺 Wet Garden", key: "neigh_garden" }
+      ],
+      aunt: [
+        { text: "📺 TV Cuddle", key: "aunt_tv" },
+        { text: "🛏️ Bed Tease", key: "aunt_bed" }
+      ]
+    };
+
+    function showScenes(character) {
+      document.getElementById("main").style.display = "none";
+      document.getElementById("scenes").style.display = "block";
+
+      const sceneList = scenes[character];
+      const container = document.getElementById("scene-buttons");
+      container.innerHTML = "";
+
+      sceneList.forEach(scene => {
+        const btn = document.createElement("button");
+        btn.innerText = scene.text;
+        btn.onclick = () => selectScene(scene.key);
+        container.appendChild(btn);
+      });
+
+      const titles = {
+        cass: "Cassandra’s Scenes",
+        chef: "Chef Bianće’s Scenes",
+        neigh: "Scarlett’s Scenes",
+        aunt: "Aunt Lana’s Scenes"
+      };
+      document.getElementById("scene-title").innerText = titles[character];
+    }
+
+    function selectScene(sceneKey) {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.sendData(sceneKey);
+        Telegram.WebApp.close();
+      } else {
+        alert("Telegram WebApp not available.");
+      }
+    }
+
+    function goBack() {
+      document.getElementById("main").style.display = "block";
+      document.getElementById("scenes").style.display = "none";
+    }
+
+    // Expand app full-screen in Telegram
+    if (window.Telegram && Telegram.WebApp) {
+      Telegram.WebApp.expand();
+    }
+  </script>
 </body>
 </html>
