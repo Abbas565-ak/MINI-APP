@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,126 +7,115 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1a1a1a;
-            color: white;
+            font-family: 'Arial', sans-serif;
+            background: #ffeff5;
             margin: 0;
             padding: 15px;
+            color: #333;
         }
         h1 {
-            color: #ff4da6;
+            color: #d23369;
             text-align: center;
         }
-        .btn {
-            background: #ff4da6;
-            color: white;
-            border: none;
-            padding: 12px;
-            margin: 5px 0;
-            border-radius: 8px;
-            width: 100%;
-            font-size: 16px;
+        .character-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .character-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(210, 51, 105, 0.1);
+            transition: transform 0.2s;
+            text-align: center;
             cursor: pointer;
         }
-        .btn:hover {
-            background: #e04395;
+        .character-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(210, 51, 105, 0.2);
         }
-        #characters {
-            display: block;
-        }
-        #scenes {
-            display: none;
-        }
-        .back-btn {
-            background: #333;
+        .character-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
         }
     </style>
 </head>
 <body>
-    <h1>💋 Vixens Fantasy</h1>
+    <h1>Choose Your Fantasy</h1>
     
-    <div id="characters">
-        <button class="btn" onclick="showScenes('cass')">👩 Cassandra</button>
-        <button class="btn" onclick="showScenes('chef')">👩‍🍳 Chef Bianće</button>
-        <button class="btn" onclick="showScenes('neigh')">🏡 Scarlett</button>
-        <button class="btn" onclick="showScenes('aunt')">👩 Aunt Lana</button>
-    </div>
-    
-    <div id="scenes">
-        <h2 id="scene-title"></h2>
-        <div id="scene-buttons"></div>
-        <button class="btn back-btn" onclick="showCharacters()">← Back</button>
+    <div class="character-grid">
+        <!-- Cassandra -->
+        <div class="character-card" onclick="selectScene('cass_sleep')">
+            <div class="character-icon">💤</div>
+            <h3>Sleeping Tease</h3>
+            <p>Cassandra wakes up unexpectedly</p>
+        </div>
+        
+        <div class="character-card" onclick="selectScene('cass_kitchen')">
+            <div class="character-icon">🍳</div>
+            <h3>Kitchen Flirt</h3>
+            <p>Apron-only cooking</p>
+        </div>
+        
+        <!-- Chef Bianće -->
+        <div class="character-card" onclick="selectScene('chef_cream')">
+            <div class="character-icon">👅</div>
+            <h3>Cream Lick</h3>
+            <p>Playful tasting moment</p>
+        </div>
+        
+        <div class="character-card" onclick="selectScene('chef_bend')">
+            <div class="character-icon">🔥</div>
+            <h3>Bend Over</h3>
+            <p>Oven view special</p>
+        </div>
+        
+        <!-- Scarlett -->
+        <div class="character-card" onclick="selectScene('neigh_bath')">
+            <div class="character-icon">🚿</div>
+            <h3>Towel Drop</h3>
+            <p>"Accidental" reveal</p>
+        </div>
+        
+        <div class="character-card" onclick="selectScene('neigh_garden')">
+            <div class="character-icon">🌺</div>
+            <h3>Wet Garden</h3>
+            <p>See-through watering</p>
+        </div>
+        
+        <!-- Aunt Lana -->
+        <div class="character-card" onclick="selectScene('aunt_tv')">
+            <div class="character-icon">📺</div>
+            <h3>TV Cuddle</h3>
+            <p>Close quarters</p>
+        </div>
+        
+        <div class="character-card" onclick="selectScene('aunt_bed')">
+            <div class="character-icon">🛏️</div>
+            <h3>Bed Tease</h3>
+            <p>Late night "help"</p>
+        </div>
     </div>
 
     <script>
-        // Telegram WebApp check
-        const tg = window.Telegram?.WebApp;
-        const isTelegram = !!tg;
+        // Initialize Telegram WebApp
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        Telegram.WebApp.MainButton.setText("Ready").show().onClick(() => {
+            Telegram.WebApp.close();
+        });
 
-        // Initialize if in Telegram
-        if (isTelegram) {
-            tg.expand();  // Full-screen mode
-            tg.ready();   // Tell Telegram we're ready
-        }
-
-        const scenes = {
-            cass: [
-                { name: "💤 Sleeping Tease", id: "cass_sleep" },
-                { name: "🍳 Kitchen Flirt", id: "cass_kitchen" }
-            ],
-            chef: [
-                { name: "👅 Cream Lick", id: "chef_cream" },
-                { name: "🔥 Bend Over Oven", id: "chef_bend" }
-            ],
-            neigh: [
-                { name: "🚿 Towel Drop", id: "neigh_bath" },
-                { name: "🌺 Wet Garden", id: "neigh_garden" }
-            ],
-            aunt: [
-                { name: "📺 TV Cuddle", id: "aunt_tv" },
-                { name: "🛏️ Bed Tease", id: "aunt_bed" }
-            ]
-        };
-
-        function showScenes(character) {
-            document.getElementById('characters').style.display = 'none';
-            document.getElementById('scenes').style.display = 'block';
-            
-            // Set title
-            const titles = {
-                cass: "Cassandra's Scenes",
-                chef: "Chef Bianće's Scenes",
-                neigh: "Scarlett's Scenes",
-                aunt: "Aunt Lana's Scenes"
+        function selectScene(sceneKey) {
+            // Critical: Must match main.py's expected format
+            const data = {
+                scene: sceneKey,  // Exactly matches keys in CHARACTERS dictionary
+                timestamp: Date.now()
             };
-            document.getElementById('scene-title').textContent = titles[character];
             
-            // Add scene buttons
-            const container = document.getElementById('scene-buttons');
-            container.innerHTML = '';
-            
-            scenes[character].forEach(scene => {
-                const btn = document.createElement('button');
-                btn.className = 'btn';
-                btn.textContent = scene.name;
-                btn.onclick = () => selectScene(scene.id);
-                container.appendChild(btn);
-            });
-        }
-
-        function showCharacters() {
-            document.getElementById('characters').style.display = 'block';
-            document.getElementById('scenes').style.display = 'none';
-        }
-
-        function selectScene(sceneId) {
-            if (isTelegram) {
-                // Send the selected scene back to the bot
-                tg.sendData(sceneId);
-                tg.close();  // Close Mini App and return to chat
-            } else {
-                alert("Selected: " + sceneId + "\n(In Telegram, this would start the chat)");
-            }
+            Telegram.WebApp.sendData(JSON.stringify(data));
+            Telegram.WebApp.close();
         }
     </script>
 </body>
