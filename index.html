@@ -59,13 +59,14 @@
     </div>
 
     <script>
-        // Simple Telegram check
-        const isTelegram = !!(window.Telegram && Telegram.WebApp);
-        
+        // Telegram WebApp check
+        const tg = window.Telegram?.WebApp;
+        const isTelegram = !!tg;
+
         // Initialize if in Telegram
         if (isTelegram) {
-            Telegram.WebApp.expand();
-            Telegram.WebApp.ready();
+            tg.expand();  // Full-screen mode
+            tg.ready();   // Tell Telegram we're ready
         }
 
         const scenes = {
@@ -120,10 +121,11 @@
 
         function selectScene(sceneId) {
             if (isTelegram) {
-                Telegram.WebApp.sendData(sceneId);
-                Telegram.WebApp.close();
+                // Send the selected scene back to the bot
+                tg.sendData(sceneId);
+                tg.close();  // Close Mini App and return to chat
             } else {
-                alert("Selected: " + sceneId);
+                alert("Selected: " + sceneId + "\n(In Telegram, this would start the chat)");
             }
         }
     </script>
