@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vixens Fantasy Mini App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vixens Fantasy</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
@@ -36,19 +36,10 @@
     button:hover {
       background: #e04395;
     }
-    .warning {
-      color: #ff6b6b;
-      text-align: center;
-      margin: 1rem 0;
-      display: none;
-    }
+    #scenes { display: none; }
   </style>
 </head>
 <body>
-  <div class="warning" id="telegram-warning">
-    ⚠️ Please open this mini app through Telegram
-  </div>
-  
   <h1>💋 Vixens Fantasy</h1>
   <div id="main">
     <h2>Choose a Vixen</h2>
@@ -60,22 +51,20 @@
     </div>
   </div>
 
-  <div id="scenes" style="display:none;">
+  <div id="scenes">
     <h2 id="scene-title">Scenes</h2>
     <div id="scene-buttons" class="button-group"></div>
     <button onclick="goBack()">🔙 Back</button>
   </div>
 
   <script>
-    // Initialize Telegram WebApp
-    const tg = window.Telegram?.WebApp;
-    const isTelegram = !!tg;
+    // Lightweight Telegram check (faster than full initialization)
+    const isTelegram = !!(window.Telegram && Telegram.WebApp);
     
-    if (!isTelegram) {
-      document.getElementById('telegram-warning').style.display = 'block';
-    } else {
-      tg.expand(); // Expand to full screen
-      tg.ready(); // Notify Telegram we're ready
+    // Only initialize if in Telegram
+    if (isTelegram) {
+      Telegram.WebApp.expand();
+      Telegram.WebApp.ready();
     }
 
     const scenes = {
@@ -101,38 +90,23 @@
       document.getElementById("main").style.display = "none";
       document.getElementById("scenes").style.display = "block";
 
-      const sceneList = scenes[character];
       const container = document.getElementById("scene-buttons");
-      container.innerHTML = "";
+      container.innerHTML = scenes[character].map(scene => `
+        <button onclick="selectScene('${scene.key}')">${scene.text}</button>
+      `).join('');
 
-      sceneList.forEach(scene => {
-        const btn = document.createElement("button");
-        btn.innerText = scene.text;
-        btn.onclick = () => selectScene(scene.key);
-        container.appendChild(btn);
-      });
-
-      const titles = {
-        cass: "Cassandra's Scenes",
-        chef: "Chef Bianće's Scenes", 
-        neigh: "Scarlett's Scenes",
-        aunt: "Aunt Lana's Scenes"
-      };
-      document.getElementById("scene-title").innerText = titles[character];
+      document.getElementById("scene-title").textContent = 
+        `${character === 'cass' ? 'Cassandra' : 
+          character === 'chef' ? 'Chef Bianće' :
+          character === 'neigh' ? 'Scarlett' : 'Aunt Lana'}'s Scenes`;
     }
 
     function selectScene(sceneKey) {
       if (isTelegram) {
-        // Send structured data instead of just the key
-        const sceneData = {
-          action: "set_scene",
-          scene: sceneKey,
-          timestamp: Date.now()
-        };
-        tg.sendData(JSON.stringify(sceneData));
-        tg.close();
+        Telegram.WebApp.sendData(sceneKey);
+        Telegram.WebApp.close();
       } else {
-        alert("Scene selected: " + sceneKey + "\n(In Telegram, this would start the chat)");
+        alert(Selected: ${sceneKey}\n(Would send this to bot in Telegram));
       }
     }
 
