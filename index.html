@@ -1,44 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <!-- REQUIRED META TAGS -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vixens Fantasy</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- CRITICAL FOR TELEGRAM WEB APPS -->
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self' https://telegram.org; 
+                  connect-src 'self' https://telegram.org; 
+                  script-src 'self' https://telegram.org; 
+                  style-src 'self' 'unsafe-inline';
+                  img-src * data:;">
+    
+    <!-- TELEGRAM WEB APP INTEGRATION -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <title>Vixens Fantasy</title>
+    
     <style>
+        :root {
+            --primary-color: #d23369;
+            --secondary-color: #ff85a2;
+        }
         body {
-            font-family: 'Arial', sans-serif;
-            background: #ffeff5;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fff5f7 0%, #ffeef2 100%);
             margin: 0;
             padding: 15px;
-            color: #333;
-        }
-        h1 {
-            color: #d23369;
-            text-align: center;
+            min-height: 100vh;
         }
         .character-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 10px;
         }
         .character-card {
             background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 3px 10px rgba(210, 51, 105, 0.1);
-            transition: transform 0.2s;
+            border-radius: 16px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 12px rgba(210, 51, 105, 0.15);
+            transition: all 0.3s ease;
             text-align: center;
             cursor: pointer;
+            border: 1px solid rgba(210, 51, 105, 0.1);
         }
         .character-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(210, 51, 105, 0.2);
+            box-shadow: 0 8px 20px rgba(210, 51, 105, 0.2);
         }
         .character-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        h3 {
+            color: var(--primary-color);
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        p {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0 0;
         }
     </style>
 </head>
@@ -50,7 +82,7 @@
         <div class="character-card" onclick="selectScene('cass_sleep')">
             <div class="character-icon">💤</div>
             <h3>Sleeping Tease</h3>
-            <p>Cassandra wakes up unexpectedly</p>
+            <p>Cassandra wakes up</p>
         </div>
         
         <div class="character-card" onclick="selectScene('cass_kitchen')">
@@ -63,26 +95,26 @@
         <div class="character-card" onclick="selectScene('chef_cream')">
             <div class="character-icon">👅</div>
             <h3>Cream Lick</h3>
-            <p>Playful tasting moment</p>
+            <p>Tasting moment</p>
         </div>
         
         <div class="character-card" onclick="selectScene('chef_bend')">
             <div class="character-icon">🔥</div>
             <h3>Bend Over</h3>
-            <p>Oven view special</p>
+            <p>Oven view</p>
         </div>
         
         <!-- Scarlett -->
         <div class="character-card" onclick="selectScene('neigh_bath')">
             <div class="character-icon">🚿</div>
             <h3>Towel Drop</h3>
-            <p>"Accidental" reveal</p>
+            <p>Steamy reveal</p>
         </div>
         
         <div class="character-card" onclick="selectScene('neigh_garden')">
             <div class="character-icon">🌺</div>
             <h3>Wet Garden</h3>
-            <p>See-through watering</p>
+            <p>See-through fun</p>
         </div>
         
         <!-- Aunt Lana -->
@@ -95,7 +127,7 @@
         <div class="character-card" onclick="selectScene('aunt_bed')">
             <div class="character-icon">🛏️</div>
             <h3>Bed Tease</h3>
-            <p>Late night "help"</p>
+            <p>Late night help</p>
         </div>
     </div>
 
@@ -103,19 +135,35 @@
         // Initialize Telegram WebApp
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
-        Telegram.WebApp.MainButton.setText("Ready").show().onClick(() => {
-            Telegram.WebApp.close();
-        });
-
+        Telegram.WebApp.enableClosingConfirmation();
+        
+        // Main selection handler
         function selectScene(sceneKey) {
-            // Critical: Must match main.py's expected format
             const data = {
-                scene: sceneKey,  // Exactly matches keys in CHARACTERS dictionary
-                timestamp: Date.now()
+                scene: sceneKey,
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString()
             };
+            
+            // Validate before sending
+            if (!isValidScene(sceneKey)) {
+                Telegram.WebApp.showAlert("Invalid selection");
+                return;
+            }
             
             Telegram.WebApp.sendData(JSON.stringify(data));
             Telegram.WebApp.close();
+        }
+        
+        // Scene validation
+        function isValidScene(key) {
+            const validScenes = [
+                'cass_sleep', 'cass_kitchen',
+                'chef_cream', 'chef_bend',
+                'neigh_bath', 'neigh_garden',
+                'aunt_tv', 'aunt_bed'
+            ];
+            return validScenes.includes(key);
         }
     </script>
 </body>
