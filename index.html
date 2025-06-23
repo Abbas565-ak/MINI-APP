@@ -99,14 +99,14 @@
       document.getElementById("scene-title").innerText = titles[character];
     }
 
-    function selectScene(sceneKey) {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData(sceneKey);
-        Telegram.WebApp.close();
-      } else {
-        alert("Telegram WebApp not available.");
-      }
-    }
+  function selectScene(sceneKey) {
+  if (window.Telegram && Telegram.WebApp) {
+    Telegram.WebApp.sendData(JSON.stringify({ scene: sceneKey }));
+    Telegram.WebApp.close();
+  } else {
+    alert("Telegram WebApp not available. Open via Telegram.");
+  }
+}
 
     function goBack() {
       document.getElementById("main").style.display = "block";
