@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vixens Fantasy Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -35,9 +36,19 @@
     button:hover {
       background: #e04395;
     }
+    .warning {
+      color: #ff6b6b;
+      text-align: center;
+      margin: 1rem 0;
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <div class="warning" id="telegram-warning">
+    ⚠️ Please open this mini app through Telegram
+  </div>
+  
   <h1>💋 Vixens Fantasy</h1>
   <div id="main">
     <h2>Choose a Vixen</h2>
@@ -56,6 +67,17 @@
   </div>
 
   <script>
+    // Initialize Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    const isTelegram = !!tg;
+    
+    if (!isTelegram) {
+      document.getElementById('telegram-warning').style.display = 'block';
+    } else {
+      tg.expand(); // Expand to full screen
+      tg.ready(); // Notify Telegram we're ready
+    }
+
     const scenes = {
       cass: [
         { text: "💤 Sleeping Tease", key: "cass_sleep" },
@@ -91,31 +113,32 @@
       });
 
       const titles = {
-        cass: "Cassandra’s Scenes",
-        chef: "Chef Bianće’s Scenes",
-        neigh: "Scarlett’s Scenes",
-        aunt: "Aunt Lana’s Scenes"
+        cass: "Cassandra's Scenes",
+        chef: "Chef Bianće's Scenes", 
+        neigh: "Scarlett's Scenes",
+        aunt: "Aunt Lana's Scenes"
       };
       document.getElementById("scene-title").innerText = titles[character];
     }
 
-  function selectScene(sceneKey) {
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.sendData(JSON.stringify({ scene: sceneKey }));
-    Telegram.WebApp.close();
-  } else {
-    alert("Telegram WebApp not available. Open via Telegram.");
-  }
-}
+    function selectScene(sceneKey) {
+      if (isTelegram) {
+        // Send structured data instead of just the key
+        const sceneData = {
+          action: "set_scene",
+          scene: sceneKey,
+          timestamp: Date.now()
+        };
+        tg.sendData(JSON.stringify(sceneData));
+        tg.close();
+      } else {
+        alert("Scene selected: " + sceneKey + "\n(In Telegram, this would start the chat)");
+      }
+    }
 
     function goBack() {
       document.getElementById("main").style.display = "block";
       document.getElementById("scenes").style.display = "none";
-    }
-
-    // Expand app full-screen in Telegram
-    if (window.Telegram && Telegram.WebApp) {
-      Telegram.WebApp.expand();
     }
   </script>
 </body>
