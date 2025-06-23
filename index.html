@@ -1,119 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vixens Fantasy</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #111;
-      color: #fff;
-      margin: 0;
-      padding: 1rem;
-    }
-    h1, h2 {
-      text-align: center;
-      color: #ff4da6;
-    }
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.8rem;
-      margin-top: 1.5rem;
-    }
-    button {
-      background: #ff4da6;
-      color: #fff;
-      padding: 1rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background: #e04395;
-    }
-    #scenes { display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vixens Fantasy</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 15px;
+        }
+        h1 {
+            color: #ff4da6;
+            text-align: center;
+        }
+        .btn {
+            background: #ff4da6;
+            color: white;
+            border: none;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #e04395;
+        }
+        #characters {
+            display: block;
+        }
+        #scenes {
+            display: none;
+        }
+        .back-btn {
+            background: #333;
+        }
+    </style>
 </head>
 <body>
-  <h1>💋 Vixens Fantasy</h1>
-  <div id="main">
-    <h2>Choose a Vixen</h2>
-    <div class="button-group">
-      <button onclick="showScenes('cass')">👩 Cassandra (Stepmom)</button>
-      <button onclick="showScenes('chef')">👩‍🍳 Chef Bianće</button>
-      <button onclick="showScenes('neigh')">👩 Scarlett (Neighbor)</button>
-      <button onclick="showScenes('aunt')">👩 Aunt Lana</button>
-    </div>
-  </div>
-
-  <div id="scenes">
-    <h2 id="scene-title">Scenes</h2>
-    <div id="scene-buttons" class="button-group"></div>
-    <button onclick="goBack()">🔙 Back</button>
-  </div>
-
-  <script>
-    // Lightweight Telegram check (faster than full initialization)
-    const isTelegram = !!(window.Telegram && Telegram.WebApp);
+    <h1>💋 Vixens Fantasy</h1>
     
-    // Only initialize if in Telegram
-    if (isTelegram) {
-      Telegram.WebApp.expand();
-      Telegram.WebApp.ready();
-    }
+    <div id="characters">
+        <button class="btn" onclick="showScenes('cass')">👩 Cassandra</button>
+        <button class="btn" onclick="showScenes('chef')">👩‍🍳 Chef Bianće</button>
+        <button class="btn" onclick="showScenes('neigh')">🏡 Scarlett</button>
+        <button class="btn" onclick="showScenes('aunt')">👩 Aunt Lana</button>
+    </div>
+    
+    <div id="scenes">
+        <h2 id="scene-title"></h2>
+        <div id="scene-buttons"></div>
+        <button class="btn back-btn" onclick="showCharacters()">← Back</button>
+    </div>
 
-    const scenes = {
-      cass: [
-        { text: "💤 Sleeping Tease", key: "cass_sleep" },
-        { text: "🍳 Kitchen Flirt", key: "cass_kitchen" }
-      ],
-      chef: [
-        { text: "👅 Cream Lick", key: "chef_cream" },
-        { text: "🔥 Bend Over Oven", key: "chef_bend" }
-      ],
-      neigh: [
-        { text: "🚿 Towel Drop", key: "neigh_bath" },
-        { text: "🌺 Wet Garden", key: "neigh_garden" }
-      ],
-      aunt: [
-        { text: "📺 TV Cuddle", key: "aunt_tv" },
-        { text: "🛏️ Bed Tease", key: "aunt_bed" }
-      ]
-    };
+    <script>
+        // Simple Telegram check
+        const isTelegram = !!(window.Telegram && Telegram.WebApp);
+        
+        // Initialize if in Telegram
+        if (isTelegram) {
+            Telegram.WebApp.expand();
+            Telegram.WebApp.ready();
+        }
 
-    function showScenes(character) {
-      document.getElementById("main").style.display = "none";
-      document.getElementById("scenes").style.display = "block";
+        const scenes = {
+            cass: [
+                { name: "💤 Sleeping Tease", id: "cass_sleep" },
+                { name: "🍳 Kitchen Flirt", id: "cass_kitchen" }
+            ],
+            chef: [
+                { name: "👅 Cream Lick", id: "chef_cream" },
+                { name: "🔥 Bend Over Oven", id: "chef_bend" }
+            ],
+            neigh: [
+                { name: "🚿 Towel Drop", id: "neigh_bath" },
+                { name: "🌺 Wet Garden", id: "neigh_garden" }
+            ],
+            aunt: [
+                { name: "📺 TV Cuddle", id: "aunt_tv" },
+                { name: "🛏️ Bed Tease", id: "aunt_bed" }
+            ]
+        };
 
-      const container = document.getElementById("scene-buttons");
-      container.innerHTML = scenes[character].map(scene => `
-        <button onclick="selectScene('${scene.key}')">${scene.text}</button>
-      `).join('');
+        function showScenes(character) {
+            document.getElementById('characters').style.display = 'none';
+            document.getElementById('scenes').style.display = 'block';
+            
+            // Set title
+            const titles = {
+                cass: "Cassandra's Scenes",
+                chef: "Chef Bianće's Scenes",
+                neigh: "Scarlett's Scenes",
+                aunt: "Aunt Lana's Scenes"
+            };
+            document.getElementById('scene-title').textContent = titles[character];
+            
+            // Add scene buttons
+            const container = document.getElementById('scene-buttons');
+            container.innerHTML = '';
+            
+            scenes[character].forEach(scene => {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = scene.name;
+                btn.onclick = () => selectScene(scene.id);
+                container.appendChild(btn);
+            });
+        }
 
-      document.getElementById("scene-title").textContent = 
-        `${character === 'cass' ? 'Cassandra' : 
-          character === 'chef' ? 'Chef Bianće' :
-          character === 'neigh' ? 'Scarlett' : 'Aunt Lana'}'s Scenes`;
-    }
+        function showCharacters() {
+            document.getElementById('characters').style.display = 'block';
+            document.getElementById('scenes').style.display = 'none';
+        }
 
-    function selectScene(sceneKey) {
-      if (isTelegram) {
-        Telegram.WebApp.sendData(sceneKey);
-        Telegram.WebApp.close();
-      } else {
-        alert(Selected: ${sceneKey}\n(Would send this to bot in Telegram));
-      }
-    }
-
-    function goBack() {
-      document.getElementById("main").style.display = "block";
-      document.getElementById("scenes").style.display = "none";
-    }
-  </script>
+        function selectScene(sceneId) {
+            if (isTelegram) {
+                Telegram.WebApp.sendData(sceneId);
+                Telegram.WebApp.close();
+            } else {
+                alert("Selected: " + sceneId);
+            }
+        }
+    </script>
 </body>
 </html>
